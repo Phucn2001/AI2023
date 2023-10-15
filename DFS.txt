@@ -1,0 +1,43 @@
+public class DepthFirstPaths {
+    private boolean[] marked;
+    private int[] edgeTo;
+    private int s;
+    public DepthFirstPaths(Graph g, int s) {
+        marked = new boolean[g.V()];
+        edgeTo = new int[g.V()];
+        this.s = s;
+        dfs(g, s);
+    }
+    private void dfs(Graph g, int v) {
+        marked[v] = true;
+        for (Integer i : g.adj(v))
+            if (!marked[i]) {
+                edgeTo[i] = v;
+                dfs(g, i);
+            }
+    }
+    public boolean hasPathTo(int w) { return marked[w]; }
+    public Iterable<Integer> pathTo(int w) {
+        if (!hasPathTo(w)) return null;
+        LinkedList<Integer> path = new LinkedList<>();
+        for (int i = w; i != s; i = edgeTo[i])
+            path.addFirst(i);
+        path.addFirst(s);
+        return path;
+    }
+}
+public static void main(String[] args) {
+    Graph g = new Graph(6);
+    g.addEdge(0, 1);
+    g.addEdge(0, 2);
+    g.addEdge(0, 3);
+    g.addEdge(1, 4);
+    g.addEdge(2, 4);
+    g.addEdge(2, 5);
+
+    DepthFirstPaths path = new DepthFirstPaths(g, 0);
+    for (int i = 0; i < 6; i++) {
+        Iterable<Integer> rs = path.pathTo(i);
+        System.out.println(rs);
+    }
+}
