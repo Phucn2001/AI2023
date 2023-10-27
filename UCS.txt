@@ -1,0 +1,116 @@
+
+java import java.util.*;  
+public class UCSAlgorithm {         
+public static void ucs(Graph graph, Node startNode, Node goalNode) {         
+PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparingInt(Node::getPathCost));         
+Set<Node> explored = new HashSet<>();                 
+startNode.setPathCost(0);         
+queue.add(startNode);                  
+while (!queue.isEmpty()) {             
+Node currentNode = queue.poll();             
+explored.add(currentNode);                          
+if (currentNode.equals(goalNode)) {                 
+System.out.println("Path found!");                 
+printPath(currentNode);                 
+return;             }                          
+for (Edge edge : graph.getEdgesFromNode(currentNode)) {                 
+Node neighbor = edge.getToNode();                 
+int newCost = currentNode.getPathCost() + edge.getCost();                                  
+if (!explored.contains(neighbor) && !queue.contains(neighbor)) {                     
+neighbor.setPathCost(newCost);                     
+neighbor.setParent(currentNode);                     
+queue.add(neighbor);                 } 
+else if (queue.contains(neighbor) && newCost < neighbor.getPathCost()) {                     
+neighbor.setPathCost(newCost);                     
+neighbor.setParent(currentNode);                     
+queue.remove(neighbor);                     
+queue.add(neighbor);                 }             }         }                  
+System.out.println("Path not found!");     }          
+public static void printPath(Node node) {         
+if (node.getParent() != null) {             
+printPath(node.getParent());         }         
+System.out.print(node.getName() + " ");     }          
+public static void main(String[] args) {         // Tạo đồ thị        
+Graph graph = new Graph();                  
+Node nodeA = new Node("A");         
+Node nodeB = new Node("B");         
+Node nodeC = new Node("C");         
+Node nodeD = new Node("D");         
+Node nodeE = new Node("E");         
+Node nodeF = new Node("F");                  
+graph.addNode(nodeA);         
+graph.addNode(nodeB);         
+graph.addNode(nodeC);         
+graph.addNode(nodeD);         
+graph.addNode(nodeE);         
+graph.addNode(nodeF);                  
+graph.addEdge(nodeA, nodeB, 4);         
+graph.addEdge(nodeA, nodeC, 2);         
+graph.addEdge(nodeB, nodeC, 5);         
+graph.addEdge(nodeB, nodeD, 10);         
+graph.addEdge(nodeC, nodeE, 3);         
+graph.addEdge(nodeD, nodeF, 11);         
+graph.addEdge(nodeE, nodeD, 4);         
+graph.addEdge(nodeE, nodeF, 5);                  // Tìm đường đi từ node A đến node F         
+ucs(graph, nodeA, nodeF);     } }  
+class Graph {     
+private List<Node> nodes;     
+private List<Edge> edges;          
+public Graph() {         
+nodes = new ArrayList<>();         
+edges = new ArrayList<>();     }          
+public void addNode(Node node) {         
+nodes.add(node);     }         
+ public void addEdge(Node fromNode, Node toNode, int cost) {         
+Edge edge = new Edge(fromNode, toNode, cost);         
+edges.add(edge);     }          
+public List<Edge> getEdgesFromNode(Node node) {         
+List<Edge> result = new ArrayList<>();         
+for (Edge edge : edges) {             
+if (edge.getFromNode().equals(node)) {                 
+result.add(edge);             }         }         
+return result;     } }  
+class Node {    
+ private String name;     
+private int pathCost;     
+private Node parent;          
+public Node(String name) {        
+ this.name = name;         
+this.pathCost = Integer.MAX_VALUE;         
+this.parent = null;     }         
+ public String getName() {         
+return name;     }         
+ public int getPathCost() {        
+ return pathCost;     }         
+ public void setPathCost(int pathCost) {        
+ this.pathCost = pathCost;     }          
+public Node getParent() {         
+return parent;     }          
+public void setParent(Node parent) {         
+this.parent = parent;     }          
+@Override     
+public boolean equals(Object obj) {         
+if (this == obj) {             
+return true;         }         
+if (obj == null || getClass() != obj.getClass()) {             
+return false;         }         
+Node node = (Node) obj;         
+return name.equals(node.name);     }          
+@Override     
+public int hashCode() {         
+return Objects.hash(name);     } }  
+class Edge {     
+private Node fromNode;     
+private Node toNode;     
+private int cost;          
+public Edge(Node fromNode, Node toNode, int cost) {         
+this.fromNode = fromNode;         
+this.toNode = toNode;         
+this.cost = cost;     }          
+public Node getFromNode() {         
+return fromNode;     }          
+public Node getToNode() {         
+return toNode;     }          
+public int getCost() {         
+return cost;     } } 
+
