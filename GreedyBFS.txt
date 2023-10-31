@@ -1,0 +1,36 @@
+package game_nim_student;
+
+import java.util.PriorityQueue;
+
+public class GreedyBFS {
+public static void main (String[] args) {
+	int [][] graph = 
+        {{0,2,0,6,0},
+	{2,0,3,8,5},
+	{0,3,0,0,7},
+	{6,8,0,0,9},
+	{0,5,7,9,0}}; 
+	int startNode = 0 ;
+}
+public static void GreedyBestFirstSearch (int[][] graph, int startNode) {
+	int numNode = graph.length ;
+	boolean[] visited = new boolean[numNode] ;
+	PriorityQueue <Integer> priorityqueue = new PriorityQueue<>(numNode,(a,b) -> a-b) ;
+	visited[startNode] = true;
+	System.out.print(startNode + "") ;
+	while (true) { for (int i =0; i < numNode; i++ ) {
+	if (graph [startNode][i] !=0 && visited[i]) {
+		priorityqueue.add(i);	
+		if (priorityqueue.isEmpty()) {
+			break ;}
+		startNode = priorityqueue.poll();
+		visited[startNode] = true ;
+		System.out.print(startNode + "") ;
+		}
+	}
+	}
+		
+	}
+	
+	
+}
