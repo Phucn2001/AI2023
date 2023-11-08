@@ -1,0 +1,75 @@
+
+
+java import java.util.*;  
+public class PuzzleSolver {     
+private static final int[][] MOVES = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}}; // Các bước di chuyển: phải, xuống, trái, lên      public static void main(String[] args) {         
+int[][] puzzle = {{1, 2, 3}, {4, 0, 5}, {7, 8, 6}}; // Puzzle mục tiêu: {{1, 2, 3}, {4, 5, 6}, {7, 8, 0}}         int[][] initialState = {{2, 8, 3}, {1, 6, 4}, {7, 0, 5}}; // Trạng thái ban đầu của puzzle          
+List<int[][]> path = solvePuzzle(puzzle, initialState);         
+if (path != null) {             
+System.out.println("Đã tìm thấy lời giải:");             
+for (int[][] state : path) {                 
+printPuzzle(state);                 
+System.out.println();             }         
+} else {             
+System.out.println("Không tìm thấy lời giải!");         }     }      
+private static List<int[][]> solvePuzzle(int[][] puzzle, int[][] initialState) {         
+Map<String, int[][]> visited = new HashMap<>(); // Lưu trạng thái đã duyệt         
+Queue<int[][]> queue = new LinkedList<>(); // Hàng đợi các trạng thái chưa duyệt         
+Map<int[][], int[][]> parentMap = new HashMap<>(); // Lưu trạng thái cha của mỗi trạng thái          queue.add(initialState);         
+visited.put(getKey(initialState), null);          
+while (!queue.isEmpty()) {             
+int[][] currentState = queue.poll();              
+if (isGoalState(puzzle, currentState)) {                 
+return buildPath(currentState, parentMap);             }              
+List<int[][]> nextStates = generateNextStates(currentState);             
+for (int[][] nextState : nextStates) {                 
+if (!visited.containsKey(getKey(nextState))) {                     
+queue.add(nextState);                     
+visited.put(getKey(nextState), currentState);                     
+parentMap.put(nextState, currentState);                 }             }         }          
+return null;     }      
+private static boolean isGoalState(int[][] puzzle, int[][] state) {         
+return Arrays.deepEquals(puzzle, state);     }      
+private static List<int[][]> generateNextStates(int[][] state) {         
+List<int[][]> nextStates = new ArrayList<>();         
+int[] emptyCell = findEmptyCell(state);          
+for (int[] move : MOVES) {             
+int newRow = emptyCell[0] + move[0];             
+int newCol = emptyCell[1] + move[1];              
+if (isValidMove(state, newRow, newCol)) {                 
+int[][] nextState = cloneState(state);                 
+nextState[emptyCell[0]][emptyCell[1]] = nextState[newRow][newCol];                 
+nextState[newRow][newCol] = 0;                 
+nextStates.add(nextState);             }         }         
+return nextStates;     }      
+private static boolean isValidMove(int[][] state, int row, int col) {         
+return row >= 0 && row < state.length && col >= 0 && col < state[0].length;     }      
+private static int[] findEmptyCell(int[][] state) {         
+for (int row = 0; row < state.length; row++) {             
+for (int col = 0; col < state[0].length; col++) {                 
+if (state[row][col] == 0) {                     
+return new int[]{row, col};                 }             }         }         
+return null;     }      
+private static int[][] cloneState(int[][] state) {         
+int[][] clone = new int[state.length][];         
+for (int i = 0; i < state.length; i++) {             
+clone[i] = state[i].clone();         }         
+return clone;     }      
+private static List<int[][]> buildPath(int[][] state, Map<int[][], int[][]> parentMap) {         
+List<int[][]> path = new ArrayList<>();         
+while (state != null) {             
+path.add(0, state);             
+state = parentMap.get(state);         }         
+return path;     }      
+private static String getKey(int[][] state) {         
+StringBuilder sb = new StringBuilder();         
+for (int[] row : state) {             
+for (int num : row) {                 
+sb.append(num);             }         }         
+return sb.toString();     }      
+private static void printPuzzle(int[][] puzzle) {         
+for (int[] row : puzzle) {             
+for (int num : row) {                 
+System.out.print(num + " ");             }             
+System.out.println();         }     } } 
+
