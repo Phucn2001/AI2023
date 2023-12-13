@@ -1,0 +1,124 @@
+```java
+import java.util.Scanner;
+
+public class NimGame {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Nhập số lượng đống đá: ");
+        int n = scanner.nextInt();
+        
+        // Tạo mảng lưu số lượng đá trong mỗi đống
+        int[] heaps = new int[n];
+        for (int i = 0; i < n; i++) {
+            System.out.print("Nhập số lượng đá trong đống " + (i+1) + ": ");
+            heaps[i] = scanner.nextInt();
+        }
+        
+        // Bắt đầu trò chơi
+        boolean isPlayer1Turn = true; // Lượt chơi của người chơi 1
+        while (true) {
+            // Hiển thị trạng thái hiện tại của trò chơi
+            System.out.println("\nTrạng thái hiện tại:");
+            for (int i = 0; i < n; i++) {
+                System.out.println("Đống " + (i+1) + ": " + heaps[i] + " đá");
+            }
+            
+            // Kiểm tra xem trò chơi đã kết thúc chưa
+            boolean isGameOver = true;
+            for (int i = 0; i < n; i++) {
+                if (heaps[i] > 0) {
+                    isGameOver = false;
+                    break;
+                }
+            }
+            
+            if (isGameOver) {
+                // Nếu không còn đá nào, người chơi hiện tại thua
+                if (isPlayer1Turn) {
+                    System.out.println("\nNgười chơi 2 thắng!");
+                } else {
+                    System.out.println("\nNgười chơi 1 thắng!");
+                }
+                break;
+            }
+            
+            // Lượt chơi của người chơi hiện tại
+            int chosenHeap, stonesToRemove;
+            if (isPlayer1Turn) {
+                System.out.print("\nNgười chơi 1, chọn đống đá (từ 1 đến " + n + "): ");
+                chosenHeap = scanner.nextInt() - 1;
+                while (chosenHeap < 0 || chosenHeap >= n || heaps[chosenHeap] == 0) {
+                    System.out.print("Đống đá không hợp lệ, chọn lại: ");
+                    chosenHeap = scanner.nextInt() - 1;
+                }
+                System.out.print("Nhập số lượng đá muốn lấy từ đống " + (chosenHeap+1) + ": ");
+                stonesToRemove = scanner.nextInt();
+                while (stonesToRemove <= 0 || stonesToRemove > heaps[chosenHeap]) {
+                    System.out.print("Số lượng đá không hợp lệ, chọn lại: ");
+                    stonesToRemove = scanner.nextInt();
+                }
+            } else {
+                // Lượt chơi của trợ lý AI
+                System.out.print("\nĐến lượt trợ lý AI...");
+                int[] move = minimax(heaps);
+                chosenHeap = move[0];
+                stonesToRemove = move[1];
+                
+                System.out.println("Trợ lý AI chọn đống " + (chosenHeap+1) + " và lấy " + stonesToRemove + " đá.");
+            }
+            
+            // Cập nhật số lượng đá sau khi lấy
+            heaps[chosenHeap] -= stonesToRemove;
+            
+            // Đổi lượt chơi
+            isPlayer1Turn = !isPlayer1Turn;
+        }
+        
+        scanner.close();
+    }
+    
+    // Hàm Minimax
+    public static int[] minimax(int[] heaps) {
+        int[] move = new int[2];
+        int n = heaps.length;
+        
+        // Tìm tất cả các nước đi có thể
+        int maxScore = Integer.MIN_VALUE;
+        for (int i = 0; i < n; i++) {
+            for (int j = 1; j <= heaps[i]; j++) {
+                int[] newHeaps = heaps.clone();
+                newHeaps[i] -= j;
+                
+                // Đánh giá điểm số cho nước đi
+                int score = evaluate(newHeaps);
+                
+                // Chọn nước đi có điểm số cao nhất
+                if (score > maxScore) {
+                    maxScore = score;
+                    move[0] = i;
+                    move[1] = j;
+                }
+            }
+        }
+        
+        return move;
+    }
+    
+    // Hàm đánh giá điểm số cho trạng thái trò chơi
+    public static int evaluate(int[] heaps) {
+        int n = heaps.length;
+        
+        // Tính tổng XOR của số lượng đá trong các đống
+        int xorSum = 0;
+        for (int i = 0; i < n; i++) {
+            xorSum ^= heaps[i];
+        }
+        
+        // Trạng thái trò chơi là trạng thái thắng nếu tổng XOR khác 0
+        if (xorSum != 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+}
